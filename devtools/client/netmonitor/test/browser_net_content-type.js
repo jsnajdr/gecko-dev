@@ -32,7 +32,7 @@ function* content_type_test(isHTTPS) {
 
   let okStatus = isHTTPS ? "Connected" : "OK";
 
-  verifyRequestItemTarget(RequestsMenu.getItemAtIndex(0),
+  verifyRequestItemTarget(RequestsMenu, RequestsMenu.getItemAtIndex(0),
     "GET", sjsURL + "?fmt=xml", {
       status: 200,
       statusText: okStatus,
@@ -41,7 +41,7 @@ function* content_type_test(isHTTPS) {
       size: L10N.getFormatStrWithNumbers("networkMenu.sizeB", 42),
       time: true
     });
-  verifyRequestItemTarget(RequestsMenu.getItemAtIndex(1),
+  verifyRequestItemTarget(RequestsMenu, RequestsMenu.getItemAtIndex(1),
     "GET", sjsURL + "?fmt=css", {
       status: 200,
       statusText: okStatus,
@@ -50,7 +50,7 @@ function* content_type_test(isHTTPS) {
       size: L10N.getFormatStrWithNumbers("networkMenu.sizeB", 34),
       time: true
     });
-  verifyRequestItemTarget(RequestsMenu.getItemAtIndex(2),
+  verifyRequestItemTarget(RequestsMenu, RequestsMenu.getItemAtIndex(2),
     "GET", sjsURL + "?fmt=js", {
       status: 200,
       statusText: okStatus,
@@ -59,7 +59,7 @@ function* content_type_test(isHTTPS) {
       size: L10N.getFormatStrWithNumbers("networkMenu.sizeB", 34),
       time: true
     });
-  verifyRequestItemTarget(RequestsMenu.getItemAtIndex(3),
+  verifyRequestItemTarget(RequestsMenu, RequestsMenu.getItemAtIndex(3),
     "GET", sjsURL + "?fmt=json", {
       status: 200,
       statusText: okStatus,
@@ -70,7 +70,7 @@ function* content_type_test(isHTTPS) {
     });
   if (!isHTTPS) {
     // 404 doesn't work on HTTPS test harness.
-    verifyRequestItemTarget(RequestsMenu.getItemAtIndex(4),
+    verifyRequestItemTarget(RequestsMenu, RequestsMenu.getItemAtIndex(4),
       "GET", sjsURL + "?fmt=bogus", {
         status: 404,
         statusText: "Not Found",
@@ -80,7 +80,7 @@ function* content_type_test(isHTTPS) {
         time: true
       });
   }
-  verifyRequestItemTarget(RequestsMenu.getItemAtIndex(5),
+  verifyRequestItemTarget(RequestsMenu, RequestsMenu.getItemAtIndex(5),
     "GET", imageURL, {
       fuzzyUrl: true,
       status: 200,
@@ -90,7 +90,7 @@ function* content_type_test(isHTTPS) {
       size: L10N.getFormatStrWithNumbers("networkMenu.sizeB", 580),
       time: true
     });
-  verifyRequestItemTarget(RequestsMenu.getItemAtIndex(6),
+  verifyRequestItemTarget(RequestsMenu, RequestsMenu.getItemAtIndex(6),
     "GET", sjsURL + "?fmt=gzip", {
       status: 200,
       statusText: okStatus,
@@ -102,7 +102,7 @@ function* content_type_test(isHTTPS) {
     });
   if (isHTTPS) {
     // Brotli is enabled only on HTTPS.
-    verifyRequestItemTarget(RequestsMenu.getItemAtIndex(6),
+    verifyRequestItemTarget(RequestsMenu, RequestsMenu.getItemAtIndex(6),
       "GET", sjsURL + "?fmt=gzip", {
         status: 200,
         statusText: okStatus,
@@ -295,9 +295,9 @@ function* content_type_test(isHTTPS) {
 }
 
 add_task(function* () {
-    yield* content_type_test(false);
+  yield* content_type_test(false);
 });
 
 add_task(function* () {
-    yield* content_type_test(true);
+  yield* content_type_test(true);
 });

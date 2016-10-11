@@ -29,6 +29,7 @@ const {CustomRequestView} = require("./custom-request-view");
 const {ToolbarView} = require("./toolbar-view");
 const {configureStore} = require("./store");
 const {PerformanceStatisticsView} = require("./performance-statistics-view");
+var {Prefs} = require("./prefs");
 
 // Initialize the global redux variables
 var gStore = configureStore();
@@ -210,7 +211,6 @@ var NetMonitorView = {
    */
   showNetworkInspectorView: function () {
     this._body.selectedPanel = $("#network-inspector-view");
-    this.RequestsMenu._flushWaterfallViews(true);
   },
 
   /**
@@ -233,7 +233,7 @@ var NetMonitorView = {
         // • The response content size and request total time are necessary for
         // populating the statistics view.
         // • The response mime type is used for categorization.
-        yield whenDataAvailable(requestsView.attachments, [
+        yield whenDataAvailable(requestsView.store, [
           "responseHeaders", "status", "contentSize", "mimeType", "totalTime"
         ]);
       } catch (ex) {
@@ -241,8 +241,9 @@ var NetMonitorView = {
         console.error(ex);
       }
 
-      statisticsView.createPrimedCacheChart(requestsView.items);
-      statisticsView.createEmptyCacheChart(requestsView.items);
+      const { requests } = requestsView.store.getState();
+      statisticsView.createPrimedCacheChart(requests);
+      statisticsView.createEmptyCacheChart(requests);
     });
   },
 
@@ -298,7 +299,6 @@ SidebarView.prototype = {
    */
   toggle: function (visibleFlag) {
     NetMonitorView.toggleDetailsPane({ visible: visibleFlag });
-    NetMonitorView.RequestsMenu._flushWaterfallViews(true);
   },
 
   /**
@@ -1189,8 +1189,8 @@ var $all = (selector, target = document) => target.querySelectorAll(selector);
 /**
  * Makes sure certain properties are available on all objects in a data store.
  *
- * @param array dataStore
- *        A list of objects for which to check the availability of properties.
+ * @param Store dataStore
+ *        A Redux store for which to check the availability of properties.
  * @param array mandatoryFields
  *        A list of strings representing properties of objects in dataStore.
  * @return object
@@ -1198,24 +1198,27 @@ var $all = (selector, target = document) => target.querySelectorAll(selector);
  *         properties defined in mandatoryFields.
  */
 function whenDataAvailable(dataStore, mandatoryFields) {
-  let deferred = promise.defer();
+  return new Promise((resolve, reject) => {
+    let interval = setInterval(() => {
+      const { requests } = dataStore.getState();
+      const allFieldsPresent = requests.every(
+        item => mandatoryFields.every(
+          field => item.get(field) !== undefined
+        )
+      );
 
-  let interval = setInterval(() => {
-    if (dataStore.every(item => {
-      return mandatoryFields.every(field => field in item);
-    })) {
+      if (allFieldsPresent) {
+        clearInterval(interval);
+        clearTimeout(timer);
+        resolve();
+      }
+    }, WDA_DEFAULT_VERIFY_INTERVAL);
+
+    let timer = setTimeout(() => {
       clearInterval(interval);
-      clearTimeout(timer);
-      deferred.resolve();
-    }
-  }, WDA_DEFAULT_VERIFY_INTERVAL);
-
-  let timer = setTimeout(() => {
-    clearInterval(interval);
-    deferred.reject(new Error("Timed out while waiting for data"));
-  }, WDA_DEFAULT_GIVE_UP_TIMEOUT);
-
-  return deferred.promise;
+      reject(new Error("Timed out while waiting for data"));
+    }, WDA_DEFAULT_GIVE_UP_TIMEOUT);
+  });
 }
 
 /**

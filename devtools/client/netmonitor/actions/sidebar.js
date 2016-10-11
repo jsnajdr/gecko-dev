@@ -3,23 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 "use strict";
 
-const {
-  DISABLE_TOGGLE_BUTTON,
-  SHOW_SIDEBAR,
-  TOGGLE_SIDEBAR,
-} = require("../constants");
-
-/**
- * Change ToggleButton disabled state.
- *
- * @param {boolean} disabled - expected button disabled state
- */
-function disableToggleButton(disabled) {
-  return {
-    type: DISABLE_TOGGLE_BUTTON,
-    disabled: disabled,
-  };
-}
+const { SHOW_SIDEBAR } = require("../constants");
 
 /**
  * Change sidebar visible state.
@@ -37,13 +21,13 @@ function showSidebar(visible) {
  * Toggle to show/hide sidebar.
  */
 function toggleSidebar() {
-  return {
-    type: TOGGLE_SIDEBAR,
+  return (dispatch, getState) => {
+    const { visible } = getState().sidebar;
+    dispatch(showSidebar(!visible));
   };
 }
 
 module.exports = {
-  disableToggleButton,
   showSidebar,
   toggleSidebar,
 };

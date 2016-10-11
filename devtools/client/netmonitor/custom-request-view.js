@@ -6,6 +6,7 @@
 
 const {Task} = require("devtools/shared/task");
 const {writeHeaderText, getKeyWithEvent} = require("./request-utils");
+const Actions = require("./actions/index");
 
 loader.lazyRequireGetter(this, "NetworkHelper",
   "devtools/shared/webconsole/network-helper");
@@ -72,37 +73,41 @@ CustomRequestView.prototype = {
    */
   onUpdate: function (field) {
     let selectedItem = NetMonitorView.RequestsMenu.selectedItem;
+    let store = NetMonitorView.RequestsMenu.store;
     let value;
 
     switch (field) {
       case "method":
         value = $("#custom-method-value").value.trim();
-        selectedItem.attachment.method = value;
+        store.dispatch(Actions.updateRequest(selectedItem.id, { method: value }));
         break;
       case "url":
         value = $("#custom-url-value").value;
         this.updateCustomQuery(value);
-        selectedItem.attachment.url = value;
+        store.dispatch(Actions.updateRequest(selectedItem.id, { url: value }));
         break;
       case "query":
         let query = $("#custom-query-value").value;
         this.updateCustomUrl(query);
-        field = "url";
         value = $("#custom-url-value").value;
-        selectedItem.attachment.url = value;
+        store.dispatch(Actions.updateRequest(selectedItem.id, { url: value }));
         break;
       case "body":
         value = $("#custom-postdata-value").value;
-        selectedItem.attachment.requestPostData = { postData: { text: value } };
+        store.dispatch(Actions.updateRequest(selectedItem.id, {
+          requestPostData: {
+            postData: { text: value }
+          }
+        }));
         break;
       case "headers":
         let headersText = $("#custom-headers-value").value;
         value = parseHeadersText(headersText);
-        selectedItem.attachment.requestHeaders = { headers: value };
+        store.dispatch(Actions.updateRequest(selectedItem.id, {
+          requestHeaders: { headers: value }
+        }));
         break;
     }
-
-    NetMonitorView.RequestsMenu.updateMenuView(selectedItem, field, value);
   },
 
   /**

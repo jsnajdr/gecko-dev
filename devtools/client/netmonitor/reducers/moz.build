@@ -7,4 +7,5 @@ DevToolsModules(
     'filters.js',
     'index.js',
     'sidebar.js',
+    'timing-markers.js',
 )

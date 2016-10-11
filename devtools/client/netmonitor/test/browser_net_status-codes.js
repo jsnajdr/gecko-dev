@@ -114,7 +114,8 @@ add_task(function* () {
       requestItems[index] = item;
 
       info("Verifying request #" + index);
-      yield verifyRequestItemTarget(item, request.method, request.uri, request.details);
+      yield verifyRequestItemTarget(RequestsMenu, item,
+        request.method, request.uri, request.details);
 
       index++;
     }
@@ -207,7 +208,8 @@ add_task(function* () {
    */
   function chooseRequest(index) {
     let onTabUpdated = monitor.panelWin.once(EVENTS.TAB_UPDATED);
-    EventUtils.sendMouseEvent({ type: "mousedown" }, requestItems[index].target);
+    let target = getItemTarget(RequestsMenu, requestItems[index]);
+    EventUtils.sendMouseEvent({ type: "mousedown" }, target);
     return onTabUpdated;
   }
 });

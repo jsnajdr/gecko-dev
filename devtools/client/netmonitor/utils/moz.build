@@ -4,13 +4,5 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 DevToolsModules(
-    'filter-buttons.js',
-    'request-list-content.js',
-    'request-list-empty.js',
-    'request-list-header.js',
-    'request-list-item.js',
-    'request-list-tooltip.js',
-    'request-list.js',
-    'search-box.js',
-    'toggle-button.js',
+    'format-utils.js'
 )

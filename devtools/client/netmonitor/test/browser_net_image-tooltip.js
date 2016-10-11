@@ -23,7 +23,7 @@ add_task(function* test() {
   yield onThumbnail;
 
   info("Checking the image thumbnail after a few requests were made...");
-  yield showTooltipAndVerify(RequestsMenu.tooltip, RequestsMenu.items[5]);
+  yield showTooltipAndVerify(RequestsMenu.tooltip, RequestsMenu.getItemAtIndex(5));
 
   // 7 XHRs as before + 1 extra document reload
   onEvents = waitForNetworkEvents(monitor, 8);
@@ -36,10 +36,10 @@ add_task(function* test() {
   yield onThumbnail;
 
   info("Checking the image thumbnail after a reload.");
-  yield showTooltipAndVerify(RequestsMenu.tooltip, RequestsMenu.items[6]);
+  yield showTooltipAndVerify(RequestsMenu.tooltip, RequestsMenu.getItemAtIndex(6));
 
   info("Checking if the image thumbnail is hidden when mouse leaves the menu widget");
-  let requestsMenuEl = $("#requests-menu-contents");
+  let requestsMenuEl = $(".requests-menu-contents");
   let onHidden = RequestsMenu.tooltip.once("hidden");
   EventUtils.synthesizeMouse(requestsMenuEl, 0, 0, {type: "mouseout"}, monitor.panelWin);
   yield onHidden;
@@ -57,7 +57,7 @@ add_task(function* test() {
    * with the expected content.
    */
   function* showTooltipAndVerify(tooltip, requestItem) {
-    let anchor = $(".requests-menu-file", requestItem.target);
+    let anchor = $(".requests-menu-file", getItemTarget(RequestsMenu, requestItem));
     yield showTooltipOn(tooltip, anchor);
 
     info("Tooltip was successfully opened for the image request.");
